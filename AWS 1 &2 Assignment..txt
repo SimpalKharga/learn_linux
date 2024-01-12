@@ -1,0 +1,212 @@
+Log into the AWS account as an IAM user, add MFA, install AWS CLI, configure it in the terminal, and list IAM user actions using CLI command.
+
+E: Unable to locate package awslcli
+root@DESKTOP-NJSOG33:~# apt install awscli
+Reading package lists... Done
+Building dependency tree... Done
+Reading state information... Done
+awscli is already the newest version (1.22.34-1).
+0 upgraded, 0 newly installed, 0 to remove and 0 not upgraded.
+root@DESKTOP-NJSOG33:~# aws configure
+
+===================================================
+AWS CONFIGURE :-
+
+root@DESKTOP-NJSOG33:~# aws configure
+AWS Access Key ID [****************mpal]: AKIAQUELARTE2OBP5CEJ
+AWS Secret Access Key [****************l@01]: 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
+Default region name [us-east-1]: ap-south-1
+Default output format [json]:
+
+You need to assign the full fledged pilicy to the uswrs with which you wanna log in to local terminal.
+You can genrate teh access key by goin on the user dashboard and clicking on generate access key.
+ 
+Notes:-The aws- configure command creates a configuration file
+(typically located at '/ .aws/config ). you can manually edit this fule if needed. 
+
+=========
+ FOR now:- below are the credentials created for secret key and password.
+ AKIAQUELARTE2OBP5CEJ
+qyJyonWGCKG18eNWfGvCw7maikYvxeabJg7qNOEN
+===================================================================
+
+To GENERATE all USERS LIST :-
+
+root@DESKTOP-NJSOG33:~# ^C
+root@DESKTOP-NJSOG33:~# aws iam list-users
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "Alice",
+            "UserId": "AIDAQUELARTE22AVIHUQ6",
+            "Arn": "arn:aws:iam::043241213129:user/Alice",
+            "CreateDate": "2024-01-10T12:11:03Z"
+        },
+        {
+            "Path": "/",
+            "UserName": "Bob",
+            "UserId": "AIDAQUELARTERE23HBMUN",
+            "Arn": "arn:aws:iam::043241213129:user/Bob",
+            "CreateDate": "2024-01-10T12:14:08Z"
+==========================================================
+
+                                     (USE AWS CLI)
+
+Create 6 IAM Users:
+1. Alice  2. Bob  3. Charles
+4. David 5. Edward 6. Fred
+
+Solutions:-
+root@DESKTOP-NJSOG33:AWS# aws iam help
+root@DESKTOP-NJSOG33:AWS# aws iam create-user help
+root@DESKTOP-NJSOG33:AWS# aws iam create-user --user-name Alice
+
+
+root@DESKTOP-NJSOG33:AWS# aws iam create-user --user-name Alice
+
+{
+    "User": {
+        "Path": "/",
+        "UserName": "Alice",
+        "UserId": "AIDAQUELARTEZAW6QT5GZ",
+        "Arn": "arn:aws:iam::043241213129:user/Alice",
+        "CreateDate": "2024-01-12T06:22:57Z"
+    }
+}
+
+Likewise we will create all the users.
+
+Note- to come out of the help file press 'q'
+==========================================================
+
+
+Create 3 groups:
+1. Developers 2. Operations 3. Audit-Team.
+
+SOLUTIONS :-
+
+root@DESKTOP-NJSOG33:AWS# aws iam help
+root@DESKTOP-NJSOG33:AWS# aws iam create-group help
+root@DESKTOP-NJSOG33:AWS# aws iam create-group  --group-name Developers
+{
+    "Group": {
+        "Path": "/",
+        "GroupName": "Developers",
+        "GroupId": "AGPAQUELARTEVMB2URNGU",
+        "Arn": "arn:aws:iam::043241213129:group/Developers",
+        "CreateDate": "2024-01-12T06:26:03Z"
+    }
+}
+
+Likewise create all the groups.
+
+==========================================================
+
+
+Assign the "IAMReadOnlyAccess" policy to the Developers group.
+Assign the "IAMReadOnlyAccess" policy to the Operations group.
+Assign the "IAMFullAccess" policy to the Audit-Team group.
+SOLUTIONs:-
+
+root@DESKTOP-NJSOG33:AWS# aws iam  help
+root@DESKTOP-NJSOG33:AWS# aws iam attach-group-policy help
+root@DESKTOP-NJSOG33:AWS# aws iam attach-group-policy  --group-name Developers --policy-arn arn:aws:iam::aws:policy/IAMReadOnlyAccess
+
+Likewise we will create three groups .
+Note :- copy the 'ARN' id from AWS terminal => iam => policy => policy => arn id
+
+===========================================================
+Add Alice, Bob, and Charles to the Developers group.
+
+SOLUTIONS:-
+
+root@DESKTOP-NJSOG33:AWS# aws iam help
+root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group help
+root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group help
+root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group  --group-name Alice
+
+root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group   --group-name Developers  --user-name Bob
+
+
+===========================================================
+
+
+
+
+Add David and Edward to the Operations group.
+
+root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group   --group-name Operations  --user-name David
+
+===========================================================
+
+
+Add Charles and David to the Audit-Team group.
+ 
+SOLUTIONS:-  root@DESKTOP-NJSOG33:AWS# aws iam add-user-to-group   --group-name Audit-Team  --user-name David
+
+===========================================================
+
+Assign an inline policy to Fred.
+
+SOLUTIONS :-
+
+root@DESKTOP-NJSOG33:AWS# vim policy.json
+note( create a meanigful file on terminal to copy json format of the required policy)
+    To take the json format of the required policy :- policy => search for required policy => click on that => click on json => click on copy => paste it on terminal file you have recently created.
+
+root@DESKTOP-NJSOG33:AWS# aws iam help
+
+root@DESKTOP-NJSOG33:AWS# aws iam create-policy help
+
+root@DESKTOP-NJSOG33:AWS# aws iam create-policy  --policy-name simpal-policy --policy-document file://policy.json
+{
+    "Policy": {
+        "PolicyName": "simpal-policy",
+        "PolicyId": "ANPAQUELARTES2DNVTI7S",
+        "Arn": "arn:aws:iam::043241213129:policy/simpal-policy",
+        "Path": "/",
+        "DefaultVersionId": "v1",
+        "AttachmentCount": 0,
+        "PermissionsBoundaryUsageCount": 0,
+        "IsAttachable": true,
+        "CreateDate": "2024-01-12T07:04:36Z",
+        "UpdateDate": "2024-01-12T07:04:36Z"
+    }
+}
+
+root@DESKTOP-NJSOG33:AWS# aws iam help
+root@DESKTOP-NJSOG33:AWS# aws iam attach-role-policy help
+root@DESKTOP-NJSOG33:AWS# aws iam help
+root@DESKTOP-NJSOG33:AWS# aws iam attach-user-policy help
+root@DESKTOP-NJSOG33:AWS# aws iam attach-user-policy --user-name Fred --policy-arn arn:aws:iam::043241213129:policy/simpal-policy	
+	
+NOTE :- For arn again go to the terminal and under policy search for the policy you created ( in here 'simpal-policy) and copy the arn fom there and paste it on terminal.
+
+And after running this command do check the assigned pilicy ny goin on user 'FRED'.
+
+===========================================================
+Log into the AWS account as an IAM user, 
+
+and list IAM user actions in terminal
+
+SOLUTIONS:-
+
+root@DESKTOP-NJSOG33:AWS# aws iam list-users
+{
+    "Users": [
+        {
+            "Path": "/",
+            "UserName": "Alice",
+            "UserId": "AIDAQUELARTEZAW6QT5GZ",
+            "Arn": "arn:aws:iam::043241213129:user/Alice",
+            "CreateDate": "2024-01-12T06:22:57Z"
+        },
+        {
+            "Path": "/",
+            "UserName": "Bob",
+            "UserId": "AIDAQUELARTE3LU56AGIY",
+            "Arn": "arn:aws:iam::043241213129:user/Bob",
+            "CreateDate": "2024-01-12T06:23:11Z"			
+
+===========================================================
