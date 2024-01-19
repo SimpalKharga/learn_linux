@@ -1,0 +1,256 @@
+Here is DOCKER Hands on Lab 06.
+ 
+   Deadline :-  18 Jan 2024  till 3:30 PM  	
+ 
+**Task List: Docker Image Creation and Deployment**
+ 
+1. **Create Directories:**
+   - Establish two directories named "DHUB" and "AWSECR."
+   
+   SOLUTION:- mkdir DHUB AWSECR
+
+   
+================================================= 
+ 
+2. **Dockerfile Creation:**
+   - Develop two Dockerfiles to construct custom images with the following specifications:
+     - Base image: Ubuntu
+     - Installed packages: httpd
+     - Add "I am from Docker Hub" to the index.html file for DHUB directory and "I am from ECR" for AWSECR directory.
+     - Set environment variable ENV_NAME=DHUB for the DHUB directory and ENV_NAME=AWSECR for the AWSECR directory.
+  - Start http service using ENTRYPOINT 
+  -  Expose port 80.
+
+root@DESKTOP-NJSOG33:ASSIGNMENTS# ll
+total 0
+drwxrwxrwx 1 simpal simpal 4096 Jan 19 12:51 ./
+drwxrwxrwx 1 simpal simpal 4096 Jan 11 18:13 ../
+drwxrwxrwx 1 simpal simpal 4096 Jan 19 12:51 AWSECR/
+drwxrwxrwx 1 simpal simpal 4096 Jan 19 13:04 DHUB/
+root@DESKTOP-NJSOG33:ASSIGNMENTS# cd AWSECR/
+
+
+root@DESKTOP-NJSOG33:ASSIGNMENTS# cat AWSECR/Dockerfile
+FROM ubuntu
+RUN apt-get update && apt-get install -y apache2
+RUN echo "I am from ECR" > /var/www/html/index.html
+ENV ENV_NAME=AWSECR
+EXPOSE 80
+ENTRYPOINT ["apache2ctl", "-D", "FOREGROUND"]
+root@DESKTOP-NJSOG33:ASSIGNMENTS#
+
+
+oot@DESKTOP-NJSOG33:ASSIGNMENTS# cat DHUB/Dockerfile
+FROM ubuntu
+RUN apt-get update && apt-get install -y apache2
+RUN echo "I am from Docker Hub" > /var/www/html/index.html
+ENV ENV_NAME=DHUB
+EXPOSE 80
+ENTRYPOINT ["apache2ctl", "-D", "FOREGROUND"]
+root@DESKTOP-NJSOG33:ASSIGNMENTS#
+
+=============================================================
+ 
+3. **Build Custom Images:**
+   - Utilize the docker build command to build the custom images.
+   - List all available images using docker images.
+   
+   root@DESKTOP-NJSOG33:AWSECR# cd ..
+root@DESKTOP-NJSOG33:ASSIGNMENTS# cd AWSECR/
+
+root@DESKTOP-NJSOG33:AWSECR# docker image build -t my_awscer_image .
+[+] Building 13.1s (7/7) FINISHED                                                                                     docker:default
+ => [internal] load build definition from Dockerfile                                                                            0.9s
+ => => transferring dockerfile: 228B                                                                                            0.0s
+ => [internal] load .dockerignore                                                                                               0.6s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                0.0s
+ => [1/3] FROM docker.io/library/ubuntu                                                                                         0.0s
+ => CACHED [2/3] RUN apt-get update && apt-get install -y apache2                                                               0.0s
+ => [3/3] RUN echo "I am from ECR" > /var/www/html/index.html                                                                   4.2s
+ => exporting to image                                                                                                          5.0s
+ => => exporting layers                                                                                                         4.5s
+ => => writing image sha256:51bce8a24eef9706f2f31b60b67ba84fa28f5bd53166a0def93aa208b7b95cd3                                    0.1s
+ => => naming to docker.io/library/my_awscer_image                                                                              0.4s
+ 
+ 
+ 
+ root@DESKTOP-NJSOG33:ASSIGNMENTS# cd DHUB/
+root@DESKTOP-NJSOG33:DHUB# vim Dockerfile
+root@DESKTOP-NJSOG33:DHUB# vim Dockerfile
+root@DESKTOP-NJSOG33:DHUB# docker image build -t my_dhub_image .
+[+] Building 12.7s (7/7) FINISHED                                                                                     docker:default
+ => [internal] load .dockerignore                                                                                               1.7s
+ => => transferring context: 2B                                                                                                 0.0s
+ => [internal] load build definition from Dockerfile                                                                            2.2s
+ => => transferring dockerfile: 233B                                                                                            0.0s
+ => [internal] load metadata for docker.io/library/ubuntu:latest                                                                0.0s
+ => [1/3] FROM docker.io/library/ubuntu                                                                                         0.0s
+ => CACHED [2/3] RUN apt-get update && apt-get install -y apache2                                                               0.0s
+ => [3/3] RUN echo "I am from Docker Hub" > /var/www/html/index.html                                                            4.0s
+ => exporting to image                                                                                                          2.8s
+ => => exporting layers                                                                                                         2.3s
+ => => writing image sha256:aeb57ad9a6c583674f344c52c3c7089e5f98916a83f0ac925a99d7b9e1eb3d5c                                    0.2s
+ => => naming to docker.io/library/my_dhub_image            0.4s
+ 
+ 
+ root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image ls
+REPOSITORY                               TAG       IMAGE ID       CREATED         SIZE
+my_dhub_image                            latest    aeb57ad9a6c5   3 minutes ago   233MB
+my_awscer_image                          latest    51bce8a24eef   8 minutes ago   233MB
+
+====================================================================
+ 
+4. **Push Images to Repositories:**
+   - Push the Docker image to Docker Hub.
+   - Push the Docker image to AWS ECR.
+   
+   root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image tag my_dhub_image:latest simpalkharga/docker_app_images:v1
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image tag my_awscer_image:latest simpalkharga/docker_app_images:v2
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image push simpalkharga/docker_app_images:v1
+The push refers to repository [docker.io/simpalkharga/docker_app_images]
+a158556123e8: Pushed
+80f7056426de: Pushed
+a1360aae5271: Mounted from library/ubuntu
+v1: digest: sha256:af31e735382335ee93a1ee69f496acc4f9fe5e02506534d5b7a7685d51614aac size: 948
+root@DESKTOP-NJSOG33:ASSIGNMENTS#  docker image push simpalkharga/docker_app_images:v2
+The push refers to repository [docker.io/simpalkharga/docker_app_images]
+57eb6126e1f8: Pushed
+80f7056426de: Layer already exists
+a1360aae5271: Layer already exists
+v2: digest: sha256:7659ebc2a904fd6196600ed8ee5ee95f39d700a20e3175fa55d22e9e733b7908 size: 948
+root@DESKTOP-NJSOG33:ASSIGNMENTS#
+
+ 
+For pushing the image to AWS  ECR:-
+
+
+First do the 'aws configure' on local terminal (ubuntu here)
+Using passkey for root user.
+Now go to the console and search for " Amazon ECR"
+>>>>>>>>>.Amazon ECR ==> Private registry ==> Repositories ==>Create repository <<<<<<
+
+Give the required details :-
+In here i have kept the rep - private- and assign a name 'local_docker_repo'
+And "create" the repo.
+now on the repo page click on "
+Push commands for local_docker_repo
+
+on that page we will find all the needful commands  on "how to push the docker iamge to ECR"
+
+Following the contents of that page lets try :-
+A)) root@DESKTOP-NJSOG33:ASSIGNMENTS# aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin 043241213129.dkr.ecr.ap-south-1.amazonaws.com
+ 
+WARNING! Your password will be stored unencrypted in /root/.docker/config.json.
+Configure a credential helper to remove this warning. See
+https://docs.docker.com/engine/reference/commandline/login/#credentials-store
+
+Login Succeeded
+root@DESKTOP-NJSOG33:ASSIGNMENTS#
+
+B))  As we laredy have build the image so we will move on to taging:-
+    root@DESKTOP-NJSOG33:ASSIGNMENTS# docker tag my_dhub_image:latest 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v1
+
+    root@DESKTOP-NJSOG33:ASSIGNMENTS# docker tag my_awscer_image:latest 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v2
+	
+C)) Now to push to ECR:-
+    root@DESKTOP-NJSOG33:ASSIGNMENTS# docker push 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v1
+The push refers to repository [043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo]
+a158556123e8: Pushed
+80f7056426de: Pushed
+a1360aae5271: Pushed
+v1: digest: sha256:cefe86035886cff3c95543ec4bfac9579fb1a54dc86fcbbeeafa200ad0a4828b size: 948
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker push 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v2
+The push refers to repository [043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo]
+57eb6126e1f8: Pushed
+80f7056426de: Layer already exists
+a1360aae5271: Layer already exists
+v2: digest: sha256:55f99860454c1ae97a97cf9897477f19b772230416cb9c874f265891c039d4e1 size: 948
+root@DESKTOP-NJSOG33:ASSIGNMENTS#	
+
+D)) Using the below steps you can check the pushed images list:
+     Amazon ECR ==> Private registry ==>Repositories ==>local_docker_repo	
+	
+	
+ -----------------------------------------
+ ==============================================
+ 
+
+ 
+5. **Run Containers:**
+   - Execute a container from the Docker Hub image, naming it "I_AM_FROM_DHUB," and mapping host port 8081 to the container.
+ 
+   ```
+   docker run -d -p 8081:80 --name I_AM_FROM_DHUB your_docker_hub_image ```
+   
+   
+   SOLUTIONS:-
+   First using "rm" comamnd we removed all the previos images available .
+   
+   Then,pull and create the container:-
+   root@DESKTOP-NJSOG33:ASSIGNMENTS# docker pull simpalkharga/docker_app_images:v1
+v1: Pulling from simpalkharga/docker_app_images
+a48641193673: Already exists
+739fc29a88b9: Already exists
+0b180e5a00e1: Already exists
+Digest: sha256:af31e735382335ee93a1ee69f496acc4f9fe5e02506534d5b7a7685d51614aac
+Status: Downloaded newer image for simpalkharga/docker_app_images:v1
+docker.io/simpalkharga/docker_app_images:v1
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image ls
+REPOSITORY                               TAG       IMAGE ID       CREATED             SIZE
+simpalkharga/docker_app_images           v1        aeb57ad9a6c5   About an hour ago   233MB
+simpal_custom_ubuntu                     latest    e7cb55377fca   35 hours ago        259MB
+
+   
+ 
+ -----------------------------------------------
+ 
+   - Execute a container from the AWS ECR image, naming it "I_AM_FROM_ECR," and mapping host port 8082 to the container.
+ 
+   ```
+   docker run -d -p 8082:80 --name I_AM_FROM_ECR your_aws_ecr_image
+   ```
+   SOLUTIONS:-
+ 
+ root@DESKTOP-NJSOG33:ASSIGNMENTS# docker pull 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v2
+v2: Pulling from local_docker_repo
+Digest: sha256:55f99860454c1ae97a97cf9897477f19b772230416cb9c874f265891c039d4e1
+Status: Downloaded newer image for 043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v2
+043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo:v2
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker iamge ls
+docker: 'iamge' is not a docker command.
+See 'docker --help'
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker image ls
+REPOSITORY                                                        TAG       IMAGE ID       CREATED        SIZE
+simpalkharga/docker_app_images                                    v1        aeb57ad9a6c5   2 hours ago    233MB
+043241213129.dkr.ecr.ap-south-1.amazonaws.com/local_docker_repo   v2        51bce8a24eef   2 hours ago    233MB
+simpalkharga/docker_app_images                                    v2        51bce8a24eef   2 hours ago    233MB
+
+
+root@DESKTOP-NJSOG33:ASSIGNMENTS# docker container run -d -p 8082:80 --name I_AM_FROM_ECR 043241213129.dkr.ecr.ap-south-1.amazonaws.c
+om/local_docker_repo:v2
+0764ce003e57da7f7ed391861dedb3084aee4a639e93a41352171141b453586c
+root@DESKTOP-NJSOG33:ASSIGNMENTS#
+
+
+=====================================================
+ 
+6. **Access Pages from Browser:**
+   - Open a web browser and access the pages:
+     - For Docker Hub: http://localhost:8081
+	 
+	 
+SOLUTION:- we went on a browser and put the above address under URL section
+          The output:-
+          I am from Docker Hub
+		  
+   - For AWS ECR: http://localhost:8082
+   
+SOLUTION :-we went on a browser and put the above address under URL section
+          The output:-
+		  I am from ECR
+   
+ 
+This task list guides you through the process of creating custom Docker images, pushing them to Docker Hub and AWS ECR, running containers, and accessing the pages from a browser.
+
+=========================================================================
